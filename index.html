@@ -1,18 +1,70 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>Mi Primera Web</title>
+    <meta charset="UTF-8">
+    <title>Sorpresa 🎁</title>
+    <style>
+        body {
+            font-family: Arial;
+            text-align: center;
+            background: linear-gradient(135deg, #74ebd5, #9face6);
+            color: #333;
+        }
+
+        .container {
+            margin-top: 100px;
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            width: 300px;
+            margin-left: auto;
+            margin-right: auto;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+
+        input {
+            width: 90%;
+            padding: 8px;
+            margin: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 10px;
+        }
+
+        button:hover {
+            background: #45a049;
+        }
+    </style>
 </head>
 <body>
-    <h1>Hola 👋</h1>
-    <p>Esta es mi primera página web</p>
 
-    <button onclick="saludar()">Haz click</button>
+    <div class="container">
+        <h2>🎁 Participa y gana</h2>
+
+        <input type="text" id="nombre" placeholder="Tu nombre"><br>
+        <input type="number" id="edad" placeholder="Tu edad"><br>
+
+        <button onclick="ganar()">Participar</button>
+    </div>
 
     <script>
-        function saludar() {
-            alert("Hola primo 😎");
+        function ganar() {
+            let nombre = document.getElementById("nombre").value;
+
+            if(nombre === "") {
+                alert("Por favor ingresa tu nombre");
+                return;
+            }
+
+            alert("🎉 Felicidades " + nombre + " 🎉\n\nEres ganador de algo increíble 💫\nNunca dejes de creer en ti 🚀");
         }
     </script>
+
 </body>
 </html>

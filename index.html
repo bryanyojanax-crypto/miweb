@@ -1,70 +1,73 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Sorpresa 🎁</title>
-    <style>
-        body {
-            font-family: Arial;
-            text-align: center;
-            background: linear-gradient(135deg, #74ebd5, #9face6);
-            color: #333;
-        }
-
-        .container {
-            margin-top: 100px;
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            width: 300px;
-            margin-left: auto;
-            margin-right: auto;
-            box-shadow: 0 0 10px rgba(0,0,0,0.2);
-        }
-
-        input {
-            width: 90%;
-            padding: 8px;
-            margin: 10px;
-        }
-
-        button {
-            padding: 10px 20px;
-            background: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 10px;
-        }
-
-        button:hover {
-            background: #45a049;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Votación Online 🗳️</title>
 </head>
-<body>
+<body style="text-align:center; font-family: Arial;">
 
-    <div class="container">
-        <h2>🎁 Participa y gana</h2>
+  <h1>🗳️ Vota por tu opción</h1>
 
-        <input type="text" id="nombre" placeholder="Tu nombre"><br>
-        <input type="number" id="edad" placeholder="Tu edad"><br>
+  <button onclick="votar('A')">Opción A</button>
+  <button onclick="votar('B')">Opción B</button>
 
-        <button onclick="ganar()">Participar</button>
-    </div>
+  <br><br>
 
-    <script>
-        function ganar() {
-            let nombre = document.getElementById("nombre").value;
+  <button onclick="verResultados()">Ver resultados</button>
 
-            if(nombre === "") {
-                alert("Por favor ingresa tu nombre");
-                return;
-            }
+  <h2 id="resultado"></h2>
 
-            alert("🎉 Felicidades " + nombre + " 🎉\n\nEres ganador de algo increíble 💫\nNunca dejes de creer en ti 🚀");
-        }
-    </script>
+  <!-- 🔥 FIREBASE COMPLETO -->
+  <script type="module">
+
+    // IMPORTS
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-analytics.js";
+    import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+
+    // TU CONFIG (ya puesta)
+    const firebaseConfig = {
+      apiKey: "AIzaSyAd2amUKd3n8V8bRZiiZsv5aVcENfw3XQE",
+      authDomain: "votacion-web.firebaseapp.com",
+      projectId: "votacion-web",
+      storageBucket: "votacion-web.firebasestorage.app",
+      messagingSenderId: "14988299286",
+      appId: "1:14988299286:web:0dfe4e7c045c7a423ab937",
+      measurementId: "G-5XW6HDV1WD"
+    };
+
+    // INICIAR FIREBASE
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const db = getFirestore(app);
+
+    // 🔥 GUARDAR VOTO
+    window.votar = async function(opcion) {
+      await addDoc(collection(db, "votos"), {
+        opcion: opcion,
+        fecha: new Date()
+      });
+
+      alert("✅ Voto registrado");
+    }
+
+    // 🔥 VER RESULTADOS
+    window.verResultados = async function() {
+      const querySnapshot = await getDocs(collection(db, "votos"));
+
+      let a = 0;
+      let b = 0;
+
+      querySnapshot.forEach((doc) => {
+        if(doc.data().opcion === "A") a++;
+        if(doc.data().opcion === "B") b++;
+      });
+
+      document.getElementById("resultado").innerHTML =
+        "Resultados:<br> A: " + a + " votos<br> B: " + b + " votos";
+    }
+
+  </script>
 
 </body>
 </html>

@@ -2,23 +2,64 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Votación 🗳️</title>
+  <title>Votación Online 🗳️</title>
+
+  <!-- Librería de gráficos -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body {
+      font-family: Arial;
+      text-align: center;
+      background: linear-gradient(135deg, #74ebd5, #9face6);
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      margin: 50px auto;
+      width: 320px;
+      border-radius: 15px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    }
+
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background: #4CAF50;
+      color: white;
+    }
+
+    button:hover {
+      background: #45a049;
+    }
+  </style>
 </head>
-<body style="text-align:center; font-family: Arial;">
 
-  <h1>🍎 Votación: Elige tu fruta favorita</h1>
+<body>
 
-  <div id="votacion">
-    <button onclick="votar('Manzana')">🍎 Manzana</button>
-    <button onclick="votar('Plátano')">🍌 Plátano</button>
-    <button onclick="votar('Fresa')">🍓 Fresa</button>
+  <div class="card">
+    <h2>🍎 Elige tu fruta favorita</h2>
+
+    <div id="votacion">
+      <button onclick="votar('Manzana')">🍎 Manzana</button>
+      <button onclick="votar('Plátano')">🍌 Plátano</button>
+      <button onclick="votar('Fresa')">🍓 Fresa</button>
+    </div>
+
+    <h3 id="mensaje"></h3>
+
+    <button onclick="verResultados()">Ver resultados</button>
+
+    <h3 id="resultado"></h3>
+
+    <canvas id="grafico"></canvas>
   </div>
 
-  <h2 id="mensaje"></h2>
-
-  <button onclick="verResultados()">Ver resultados</button>
-  <h3 id="resultado"></h3>
-
+  <!-- 🔥 FIREBASE -->
   <script type="module">
 
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
@@ -37,10 +78,10 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // 🔒 verificar si ya votó
+    // 🔒 bloquear si ya votó
     if(localStorage.getItem("votoRealizado")) {
       document.getElementById("votacion").style.display = "none";
-      document.getElementById("mensaje").innerText = "✅ Ya votaste. Gracias por participar 🙌";
+      document.getElementById("mensaje").innerText = "✅ Ya votaste 🙌";
     }
 
     // 🗳️ votar
@@ -60,12 +101,12 @@
 
       document.getElementById("votacion").style.display = "none";
       document.getElementById("mensaje").innerText =
-        "🎉 Gracias por votar por " + opcion + " 🙌";
-
+        "🎉 Gracias por votar por " + opcion;
     }
 
-    // 📊 resultados
+    // 📊 resultados + gráfico
     window.verResultados = async function() {
+
       const querySnapshot = await getDocs(collection(db, "votos"));
 
       let manzana = 0;
@@ -81,9 +122,20 @@
 
       document.getElementById("resultado").innerHTML =
         "Resultados:<br>" +
-        "🍎 Manzana: " + manzana + "<br>" +
-        "🍌 Plátano: " + platano + "<br>" +
-        "🍓 Fresa: " + fresa;
+        "🍎 " + manzana + "<br>" +
+        "🍌 " + platano + "<br>" +
+        "🍓 " + fresa;
+
+      new Chart(document.getElementById("grafico"), {
+        type: "bar",
+        data: {
+          labels: ["Manzana", "Plátano", "Fresa"],
+          datasets: [{
+            label: "Votos",
+            data: [manzana, platano, fresa]
+          }]
+        }
+      });
     }
 
   </script>

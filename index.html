@@ -2,30 +2,28 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Votación Online 🗳️</title>
+  <title>Votación 🗳️</title>
 </head>
 <body style="text-align:center; font-family: Arial;">
 
-  <h1>🗳️ Vota por tu opción</h1>
+  <h1>🍎 Votación: Elige tu fruta favorita</h1>
 
-  <button onclick="votar('A')">Opción A</button>
-  <button onclick="votar('B')">Opción B</button>
+  <div id="votacion">
+    <button onclick="votar('Manzana')">🍎 Manzana</button>
+    <button onclick="votar('Plátano')">🍌 Plátano</button>
+    <button onclick="votar('Fresa')">🍓 Fresa</button>
+  </div>
 
-  <br><br>
+  <h2 id="mensaje"></h2>
 
   <button onclick="verResultados()">Ver resultados</button>
+  <h3 id="resultado"></h3>
 
-  <h2 id="resultado"></h2>
-
-  <!-- 🔥 FIREBASE COMPLETO -->
   <script type="module">
 
-    // IMPORTS
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-analytics.js";
     import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
-    // TU CONFIG (ya puesta)
     const firebaseConfig = {
       apiKey: "AIzaSyAd2amUKd3n8V8bRZiiZsv5aVcENfw3XQE",
       authDomain: "votacion-web.firebaseapp.com",
@@ -36,35 +34,56 @@
       measurementId: "G-5XW6HDV1WD"
     };
 
-    // INICIAR FIREBASE
     const app = initializeApp(firebaseConfig);
-    const analytics = getAnalytics(app);
     const db = getFirestore(app);
 
-    // 🔥 GUARDAR VOTO
+    // 🔒 verificar si ya votó
+    if(localStorage.getItem("votoRealizado")) {
+      document.getElementById("votacion").style.display = "none";
+      document.getElementById("mensaje").innerText = "✅ Ya votaste. Gracias por participar 🙌";
+    }
+
+    // 🗳️ votar
     window.votar = async function(opcion) {
+
+      if(localStorage.getItem("votoRealizado")) {
+        alert("❌ Ya votaste");
+        return;
+      }
+
       await addDoc(collection(db, "votos"), {
         opcion: opcion,
         fecha: new Date()
       });
 
-      alert("✅ Voto registrado");
+      localStorage.setItem("votoRealizado", "si");
+
+      document.getElementById("votacion").style.display = "none";
+      document.getElementById("mensaje").innerText =
+        "🎉 Gracias por votar por " + opcion + " 🙌";
+
     }
 
-    // 🔥 VER RESULTADOS
+    // 📊 resultados
     window.verResultados = async function() {
       const querySnapshot = await getDocs(collection(db, "votos"));
 
-      let a = 0;
-      let b = 0;
+      let manzana = 0;
+      let platano = 0;
+      let fresa = 0;
 
       querySnapshot.forEach((doc) => {
-        if(doc.data().opcion === "A") a++;
-        if(doc.data().opcion === "B") b++;
+        let op = doc.data().opcion;
+        if(op === "Manzana") manzana++;
+        if(op === "Plátano") platano++;
+        if(op === "Fresa") fresa++;
       });
 
       document.getElementById("resultado").innerHTML =
-        "Resultados:<br> A: " + a + " votos<br> B: " + b + " votos";
+        "Resultados:<br>" +
+        "🍎 Manzana: " + manzana + "<br>" +
+        "🍌 Plátano: " + platano + "<br>" +
+        "🍓 Fresa: " + fresa;
     }
 
   </script>
